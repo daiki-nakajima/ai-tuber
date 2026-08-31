@@ -231,4 +231,4 @@ result = await agent.run("東京の明日の天気を教えて")
 - [システム概要](./overview.md) - 全体アーキテクチャ
 - [Saint Graph - Body Client](../components/saint-graph/body-client.md) - REST クライアント実装
 - [Body](../components/body/README.md) - REST サーバー実装
-- [Body Tools - Weather](../components/body/tools/weather.md) - MCP サーバー実装
+- [Tools - Weather](../components/tools/weather.md) - MCP サーバー実装

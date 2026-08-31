@@ -29,8 +29,7 @@ AI Tuber は、**魂（Saint Graph）**、**肉体（Body）**、**精神（Mind
 
 - [概要](./components/saint-graph/README.md)
 - [コアロジック](./components/saint-graph/core-logic.md) - Agent とターン処理
-- [ニュース配信](./components/saint-graph/news-service.md) - ニュース管理
-- [ニュース収集](./components/saint-graph/news-collector.md) - ニュースエージェント
+- [ニュース配信](./components/saint-graph/news-delivery.md) - ニュース管理
 - [Body クライアント](./components/saint-graph/body-client.md) - REST クライアント
 - [プロンプト設計](./components/saint-graph/prompts.md) - プロンプトシステム
 
@@ -40,27 +39,33 @@ AI Tuber は、**魂（Saint Graph）**、**肉体（Body）**、**精神（Mind
 
 - [概要](./components/body/README.md)
 - [GCE プロビジョニング](./components/body/provisioning.md) - startup.sh の振る舞い
-- [アーキテクチャ](./components/body/architecture.md) *(作成予定)*
 - **Streamer モード**:
-  - [概要](./components/body/streamer/overview.md) *(作成予定)*
-  - [OBS Studio](./components/body/streamer/obs-studio.md) *(作成予定)*
-  - [VoiceVox](./components/body/streamer/voicevox.md) *(作成予定)*
-  - [YouTube 統合](./components/body/streamer/youtube.md) *(作成予定)*
-  - [音声生成・再生](./components/body/streamer/audio-playback.md) *(作成予定)*
+  - [概要](./components/body/streamer/README.md) - アーキテクチャと API リファレンス
+  - [OBS 制御](./components/body/streamer/obs.md) - 表情切り替え・音声再生・配信/録画
+  - [音声合成](./components/body/streamer/voice.md) - VOICEVOX 連携
+  - [YouTube 配信管理](./components/body/streamer/youtube_live.md) - 配信枠作成・OAuth 認証
+  - [YouTube コメント取得](./components/body/streamer/youtube_comments.md) - サブプロセスによるチャット取得
 - **CLI モード**:
-  - [概要](./components/body/cli/overview.md) *(作成予定)*
-- **外部ツール**:
-  - [天気ツール](./components/body/tools/weather.md) *(作成予定)*
+  - [概要](./components/body/cli/README.md)
 
 ### Mind（精神）
 
 キャラクター定義:
 
-- [概要](./components/mind/README.md) *(作成予定)*
-- [キャラクターシステム](./components/mind/character-system.md) *(作成予定)*
-- [感情制御](./components/mind/emotion-control.md) *(作成予定)*
-- [キャラクター作成ガイド](./components/mind/character-creation-guide.md) *(作成予定)*
+- [概要](./components/mind/README.md) - キャラクター構成要素とアセット作成ガイド
 - [VOICEVOX 辞書管理](./components/mind/voicevox-dictionary.md)
+
+### Tools（MCP 拡張）
+
+AI が自律的に呼び出す外部ツール:
+
+- [天気ツール](./components/tools/weather.md) - Open-Meteo による天気予報取得
+
+### Scripts（運用スクリプト）
+
+配信パイプラインを支えるジョブ:
+
+- [ニュース収集](./components/scripts/news-collector.md) - ニュースエージェント
 
 ---
 
@@ -94,6 +99,8 @@ AI Tuber は、**魂（Saint Graph）**、**肉体（Body）**、**精神（Mind
 - `saint-graph/` - 魂（意思決定）
 - `body/` - 肉体（入出力制御）
 - `mind/` - 精神（キャラクター定義）
+- `tools/` - MCP 拡張ツール（天気など）
+- `scripts/` - 運用スクリプト（ニュース収集など）
 
 ### `/knowledge/` - ナレッジベース
 セットアップ、開発、トラブルシューティング、過去の知見
@@ -106,4 +113,4 @@ AI Tuber は、**魂（Saint Graph）**、**肉体（Body）**、**精神（Mind
 
 ---
 
-**最終更新**: 2026-02-02
+**最終更新**: 2026-08-31

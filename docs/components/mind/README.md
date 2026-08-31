@@ -60,5 +60,5 @@ AI Tuber の表現をより豊かに（Live2D的に）するため、生成動�
 ## 関連ドキュメント
 
 - [VOICEVOX ユーザー辞書の管理 (voicevox-dictionary.md)](./voicevox-dictionary.md) - 音声・発音のカスタマイズ
-- [アーキテクチャ概要 (overview.md)](../architecture/overview.md)
-- [OBS とマッピング (obs.md)](../components/body/streamer/obs.md) - Mind で作成したアセットがどう OBS で使われるか
+- [アーキテクチャ概要 (overview.md)](../../architecture/overview.md)
+- [OBS とマッピング (obs.md)](../body/streamer/obs.md) - Mind で作成したアセットがどう OBS で使われるか

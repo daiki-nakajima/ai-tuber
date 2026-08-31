@@ -287,6 +287,5 @@ sequenceDiagram
 
 - [システム概要](./overview.md) - 全体アーキテクチャ
 - [Saint Graph - Core Logic](../components/saint-graph/core-logic.md) - ターン処理の実装
-- [Body - Audio Playback](../components/body/streamer/audio-playback.md) - 音声再生システム
-- [Body - YouTube](../components/body/streamer/youtube.md) - YouTube コメント取得
-```
+- [Body - 音声合成](../components/body/streamer/voice.md) - 音声生成・再生システム
+- [Body - YouTube コメント取得](../components/body/streamer/youtube_comments.md) - YouTube コメント取得

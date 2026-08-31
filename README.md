@@ -165,13 +165,13 @@ pytest tests/unit/
 pytest tests/integration/
 ```
 
-**テストカバレッジ**: 28テスト（ユニット: 11、統合: 15、E2E: 2）
+**テストカバレッジ**: 84テスト（ユニット: 50、統合: 16、E2E: 2、インフラ・スクリプト: 16）
 
 主要テスト:
 - `test_saint_graph.py` - AI応答パース・感情制御
 - `test_speaker_id_integration.py` - VoiceVox speaker_id 伝播
 - `test_youtube_oauth.py` - YouTube OAuth 認証
-- `test_youtube_comment_adapter.py` - コメント取得
+- `test_youtube_comment_fetcher.py` - コメント取得
 
 ## キャラクター追加
 
@@ -179,13 +179,14 @@ pytest tests/integration/
 data/mind/{character_name}/
 ├── mind.json          # 技術設定（speaker_id など）
 ├── persona.md         # 性格・口調
-└── assets/            # 画像・音声
-    ├── ai_neutral.png
-    ├── ai_joyful.png
+├── user_dict.json     # VOICEVOX ユーザー辞書（任意）
+└── assets/            # モーション動画・画像・音声
+    ├── normal01.mp4
+    ├── fun01.mp4
     └── ...
 ```
 
-詳細: [キャラクター作成ガイド](docs/components/mind/character-creation-guide.md)
+詳細: [Mind コンポーネント概要](docs/components/mind/README.md)
 
 ## 主な環境変数
 
@@ -227,5 +228,5 @@ data/mind/{character_name}/
 | **アーキテクチャ** | [システム概要](docs/architecture/overview.md), [通信プロトコル](docs/architecture/communication.md), [データフロー](docs/architecture/data-flow.md) |
 | **Saint Graph（魂）** | [README](docs/components/saint-graph/README.md), [コアロジック](docs/components/saint-graph/core-logic.md), [プロンプト設計](docs/components/saint-graph/prompts.md) |
 | **Body（肉体）** | [README](docs/components/body/README.md) |
-| **Mind（精神）** | [VOICEVOX 辞書管理](docs/components/mind/voicevox-dictionary.md) |
+| **Mind（精神）** | [概要](docs/components/mind/README.md), [VOICEVOX 辞書管理](docs/components/mind/voicevox-dictionary.md) |
 | **運用・保守** | [トラブルシューティング](docs/knowledge/troubleshooting.md), [YouTube 配信セットアップ](docs/knowledge/youtube-setup.md) |

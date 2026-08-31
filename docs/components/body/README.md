@@ -43,19 +43,23 @@ Body は AI Tuber システムの「肉体」であり、物理的な入出力�
 
 ```
 src/body/
+├── rest.py                        # REST API サーバー共通実装 (BodyApp)
+├── service.py                     # 共通インターフェース (BodyServiceBase)
 ├── streamer/
-│   ├── main.py                    # REST API サーバー
-│   ├── service.py                 # ビジネスロジック
-│   ├── voice.py                   # VoiceVox アダプター
-│   ├── obs.py                     # OBS WebSocket アダプター
+│   ├── main.py                    # エントリポイント
+│   ├── service.py                 # ビジネスロジック (StreamerBodyService)
+│   ├── voice_adapter.py           # VoiceVox アダプター
+│   ├── obs_adapter.py             # OBS WebSocket アダプター
 │   ├── youtube_live_adapter.py    # YouTube Live API
-│   ├── youtube_comment_adapter.py # YouTube コメント取得
-│   ├── fetch_comments.py          # コメント取得スクリプト
-│   ├── download_assets.py         # アセット取得スクリプト (NEW)
-│   └── obs/config/                # OBS 設定ファイル
+│   ├── youtube_comment_adapter.py # コメント取得サブプロセス管理
+│   ├── youtube_comment_fetcher.py # コメント取得スクリプト
+│   ├── youtube_auth.py            # OAuth 認証
+│   ├── utils.py                   # ユーティリティ
+│   ├── scripts/                   # 認証ヘルパー等
+│   └── obs/                       # OBS コンテナ設定・アセット取得 (download_assets.py)
 ├── cli/
-│   ├── main.py                    # REST API サーバー
-│   ├── service.py                 # ビジネスロジック
+│   ├── main.py                    # エントリポイント
+│   ├── service.py                 # ビジネスロジック (CLIBodyService)
 │   └── io_adapter.py              # 標準入出力アダプター
 └── __init__.py
 ```
@@ -104,7 +108,6 @@ src/body/
 
 ## 関連ドキュメント
 
-- [アーキテクチャ](./architecture.md) - Body 全体設計
 - [GCE プロビジョニング](./provisioning.md) - startup.sh の振る舞い
 - [Streamer 概要](./streamer/README.md) - Streamerモード
 - [CLI 概要](./cli/README.md) - CLI モード

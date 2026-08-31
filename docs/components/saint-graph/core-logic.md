@@ -332,6 +332,6 @@ except Exception as e:
 ## 関連ドキュメント
 
 - [README](./README.md) - Saint Graph 概要
-- [ニュース配信](./news-service.md) - ニュース管理
+- [ニュース配信](./news-delivery.md) - ニュース管理
 - [Body クライアント](./body-client.md) - REST クライアント実装
 - [データフロー](../../architecture/data-flow.md) - 処理シーケンス
