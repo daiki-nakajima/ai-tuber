@@ -1,5 +1,6 @@
 google-genai
 httpx
 google-adk
-mcp
+# mcp 2.x は google-adk と非互換 (mcp.shared.session が削除されたため)
+mcp>=1.24,<2
 google-cloud-storage

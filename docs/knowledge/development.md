@@ -20,7 +20,9 @@ git clone https://github.com/koduki/ai-tuber.git
 cd ai-tuber
 
 # 依存関係のインストール（ローカル開発の場合）
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
+pip install -r src/saint_graph/requirements.txt
+pip install -r src/body/cli/requirements.txt
 ```
 
 ---
@@ -41,29 +43,39 @@ ai-tuber/
 │   ├── saint_graph/       # Saint Graph (魂) - Google ADK Agent
 │   │   ├── main.py        # エントリポイント
 │   │   ├── saint_graph.py # Agent 設定とターン処理
+│   │   ├── broadcast_loop.py # 配信フェーズ制御ループ
 │   │   ├── body_client.py # Body REST クライアント
+│   │   ├── news_service.py # ニュース原稿管理
 │   │   ├── prompt_loader.py # プロンプト読み込み (StorageClient 経由)
-│   │   └── config.py      # 設定管理 (SecretProvider 経由)
+│   │   ├── config.py      # 設定管理 (SecretProvider 経由)
+│   │   └── system_prompts/ # 配信フェーズごとの共通プロンプト
 │   ├── body/
+│   │   ├── rest.py        # REST API サーバー共通実装 (BodyApp)
+│   │   ├── service.py     # 共通インターフェース (BodyServiceBase)
 │   │   ├── cli/           # Body CLI (開発用)
 │   │   │   ├── main.py
-│   │   │   └── service.py
+│   │   │   ├── service.py
+│   │   │   └── io_adapter.py
 │   │   └── streamer/      # Body Streamer (本番用)
 │   │       ├── main.py
 │   │       ├── service.py
-│   │       ├── obs.py
-│   │       ├── voice.py
-│   │       └── youtube_comment_adapter.py
+│   │       ├── obs_adapter.py
+│   │       ├── voice_adapter.py
+│   │       ├── youtube_live_adapter.py
+│   │       ├── youtube_comment_adapter.py
+│   │       ├── youtube_comment_fetcher.py
+│   │       └── youtube_auth.py
 │   └── tools/
 │       └── weather/       # Weather MCP Server
 │           ├── main.py
-│           └── server.py
+│           └── tools.py
 ├── data/
 │   ├── mind/              # キャラクター定義
 │   │   └── ren/           # デフォルトキャラクター
 │   │       ├── mind.json  # 技術設定
 │   │       ├── persona.md # 性格・口調
-│   │       └── assets/    # 立ち絵・音声
+│   │       ├── user_dict.json # VOICEVOX ユーザー辞書
+│   │       └── assets/    # モーション動画・立ち絵・音声
 │   └── news/              # ニュース原稿
 ├── tests/
 │   ├── unit/              # ユニットテスト
@@ -166,23 +178,29 @@ open htmlcov/index.html
 
 ### 現在のテスト構成
 
-本システムには以下のテストが含まれています：
+本システムには 84 のテストが含まれています：
 
-- **ユニットテスト** (11)
+- **ユニットテスト** (`tests/unit/`, 50)
   - `test_prompt_loader.py` - mind.json 読み込み
   - `test_saint_graph.py` - AI 応答パース・感情制御
+  - `test_broadcast_loop.py` - 配信フェーズ制御
   - `test_obs_recording.py` - OBS 録画制御
   - `test_weather_tools.py` - 天気ツール
-  - `test_news_collector.py` - ニュース収集エージェントのクリーンアップ
+  - `test_youtube_oauth.py` - YouTube OAuth 認証
+  - `test_youtube_comment_adapter.py` / `test_youtube_comment_fetcher.py` - YouTube コメント取得
 
-- **統合テスト** (15)
+- **統合テスト** (`tests/integration/`, 16)
   - `test_speaker_id_integration.py` - speaker_id 伝播検証
   - `test_rest_body_cli.py` - Body CLI API
-  - `test_newscaster_logic_v2.py` - ニュース配信フロー
-  - `test_youtube_oauth.py` - YouTube OAuth 認証
-  - `test_youtube_comment_adapter.py` - YouTube コメント取得
+  - `test_newscaster_flow.py` / `test_newscaster_logic_v2.py` - ニュース配信フロー
+  - `test_mind_prompts.py` - プロンプト読み込み
+  - `test_agent_scenarios.py` - 実 LLM シナリオ（要 `GOOGLE_API_KEY`）
 
-- **E2E テスト** (2)
+- **インフラ・スクリプト** (`tests/infra/` ほか, 16)
+  - `test_storage_client.py` / `test_secret_provider.py` - インフラ抽象化レイヤー
+  - `test_news_collector.py` - ニュース収集エージェントのクリーンアップ
+
+- **E2E テスト** (`tests/e2e/`, 2)
   - `test_system_smoke.py` - システム全体動作確認（スキップ可能）
 
 ---
@@ -201,13 +219,16 @@ open htmlcov/index.html
 
 **編集例**: プロンプトの変更
 
+プロンプトは `PromptLoader` (`src/saint_graph/prompt_loader.py`) が読み込みます。
+
+- **共通プロンプト**（配信フェーズごとのテンプレート）: `src/saint_graph/system_prompts/*.md` を編集
+- **キャラクター固有プロンプト**（性格・口調）: `data/mind/{character_name}/persona.md` を編集
+
 ```python
-# src/saint_graph/prompts.py
-def load_system_prompt(character_name: str, scene: str) -> str:
-    """システムプロンプトを読み込む"""
-    prompt_path = f"/app/data/mind/{character_name}/system_prompts/{scene}.md"
-    with open(prompt_path, "r") as f:
-        return f.read()
+# PromptLoader の利用イメージ
+loader = PromptLoader("ren")
+system_instruction = loader.load_system_instruction()  # core_instructions.md + persona.md
+templates = loader.load_templates(["intro", "news_reading", "news_finished", "closing"])
 ```
 
 ### Body（肉体）の編集
@@ -223,14 +244,17 @@ def load_system_prompt(character_name: str, scene: str) -> str:
 **編集例**: 新しい感情を追加
 
 ```python
-# src/body/streamer/obs.py
-EMOTION_TO_IMAGE = {
-    "neutral": "ai_neutral.png",
-    "joyful": "ai_joyful.png",
-    "fun": "ai_fun.png",
-    "angry": "ai_angry.png",
-    "sad": "ai_sad.png",
-    "surprised": "ai_surprised.png",  # 新規追加
+# src/body/streamer/obs_adapter.py
+# 感情タグ → OBS ソース名のマッピング
+EMOTION_MAP = {
+    "neutral": "normal",
+    "happy": "joyful",
+    "joyful": "joyful",
+    "fun": "fun",
+    "sad": "sad",
+    "angry": "angry",
+    "silent": "silent",
+    "surprised": "surprised",  # 新規追加（OBS 側にも同名ソースが必要）
 }
 ```
 
@@ -261,7 +285,7 @@ cp data/mind/ren/persona.md data/mind/new_character/
 export CHARACTER_NAME=new_character
 ```
 
-詳細は [キャラクター作成ガイド](../components/mind/character-creation-guide.md) を参照してください。
+詳細は [Mind 概要（キャラクター作成ガイド）](../components/mind/README.md) を参照してください。
 
 ---
 
@@ -320,7 +344,7 @@ echo "今日は良い天気です。" > data/news/weather_news.txt
 1. VNC で OBS に接続: http://localhost:8080/vnc.html
 2. シーンやソースを編集
 3. **ファイル** → **設定をエクスポート** で保存
-4. `src/body/streamer/obs/scene_config.json` を更新
+4. `src/body/streamer/obs/config/basic/scenes/Untitled.json` を更新
 
 ---
 
@@ -432,4 +456,4 @@ pytest tests/integration/test_rest_body_cli.py
 
 ---
 
-**最終更新**: 2026-02-18
+**最終更新**: 2026-08-31

@@ -9,57 +9,69 @@
 data/mind/ren/
 ├── README.md           # このファイル
 ├── persona.md          # キャラクター設定（性格、口調、背景など）
-├── system_prompts/     # システムプロンプト（ニュース読み、応答など）
-│   ├── intro.md              # 配信開始時の挨拶
-│   ├── news_reading.md       # ニュース読み上げ
-│   ├── news_finished.md      # ニュース終了時
-│   ├── closing.md            # 配信終了時
-│   ├── retry_no_tool.md      # ツール未使用時の再指示
-│   └── retry_final_response.md # 最終応答の再指示
-└── assets/             # OBSで使用するアセット
-    ├── ai_normal.png   # 通常表情
-    ├── ai_joyful.png   # 喜び表情
-    ├── ai_fun.png      # 楽しい表情
-    ├── ai_sad.png      # 悲しい表情
-    └── ai_angry.png    # 怒り表情
+├── mind.json           # 技術メタデータ（VOICEVOX の speaker_id など）
+├── user_dict.json      # VOICEVOX ユーザー辞書（固有名詞の読み方）
+├── presets.yaml        # VOICEVOX プリセット
+└── assets/             # OBS で使用するアセット
+    ├── normal01.mp4    # 通常モーション（感情ごとに複数バリエーション可）
+    ├── fun01.mp4       # 楽しいモーション
+    ├── joyful〜.mp4 / sad〜.mp4 / angry〜.mp4 / silent〜.mp4
+    ├── ai_normal.png   # 静止画立ち絵（旧形式・フォールバック用）
+    └── bgm.mp3         # BGM
 ```
 
-## OBSシーン設定
+**注**: 配信フェーズごとのシステムプロンプト（intro / news_reading / closing など）はキャラクター固有ではなく、`src/saint_graph/system_prompts/` に共通プロンプトとして配置されています。キャラクターの個性は `persona.md` で定義します。
 
-OBSで以下のソースを設定してください：
+## 各ファイルの読み込まれ方
 
-### 画像ソース（表情）
-- `normal` → `/app/assets/ai_normal.png`
-- `joyful` → `/app/assets/ai_joyful.png`
-- `fun` → `/app/assets/ai_fun.png`
-- `sad` → `/app/assets/ai_sad.png`
-- `angry` → `/app/assets/ai_angry.png`
+- **persona.md / mind.json**: Saint Graph 起動時に `PromptLoader` が読み込みます（ローカル or GCS）。
+- **user_dict.json / presets.yaml**: `docker-compose.yml` により、このディレクトリ全体が VOICEVOX Engine のデータディレクトリ (`/home/user/.local/share/voicevox-engine-dev`) としてマウントされ、エンジンが直接参照します。
+- **assets/**: OBS コンテナ起動時に `download_assets.py` が取得し、OBS のシーン定義から参照されます。
+
+## OBS シーン設定
+
+シーン定義 (`src/body/streamer/obs/config/basic/scenes/Untitled.json`) には以下のソースが登録されています。
+
+### メディアソース（表情・モーション）
+
+感情ごとにループ再生されるモーション動画です。`obs_adapter.py` の `EMOTION_MAP` により感情タグからソース名に変換されます。
+
+- `normal` → 通常（`neutral` タグに対応）
+- `joyful` → 喜び（`happy` / `joyful` タグに対応）
+- `fun` → 楽しい
+- `sad` → 悲しい（`sorrow` タグにも対応）
+- `angry` → 怒り
+- `silent` → 発話していない待機状態
 
 ### メディアソース（音声）
-- `voice` → `/app/shared/audio/speech_0000.wav`
+
+- `voice` → `/app/shared/voice/speech_0000.wav`（Body が生成した音声）
+- `BGM` → `/app/assets/bgm.mp3`
 
 ## 使用方法
 
 1. コンテナ起動: `docker compose up`
-2. VNCアクセス: `http://localhost:8080/vnc.html`
-3. OBSでシーンとソースを手動設定
-4. `body-desktop`サービスが自動的に表情を切り替え、音声を再生します
+2. VNC アクセス: `http://localhost:8080/vnc.html`
+3. `body-streamer` サービスが自動的に表情を切り替え、音声を再生します
 
 ## カスタマイズ
 
 - **persona.md**: キャラクターの性格や口調を変更
-- **system_prompts/**: 各シーンのプロンプトをカスタマイズ
-- **assets/**: 独自のアバター画像に差し替え
+- **mind.json**: `speaker_id`（VOICEVOX 話者）などの技術設定を変更
+- **user_dict.json**: 固有名詞の読み方を登録（詳細: [VOICEVOX 辞書管理](../../../docs/components/mind/voicevox-dictionary.md)）
+- **assets/**: 独自のアバターモーション・画像に差し替え
 
 ## 他のキャラクターの追加
 
-新しいキャラクターを追加する場合は、`data/mind/`配下に同じ構造のディレクトリを作成してください：
+新しいキャラクターを追加する場合は、`data/mind/` 配下に同じ構造のディレクトリを作成し、環境変数 `CHARACTER_NAME` で切り替えてください：
 
 ```
 data/mind/
 ├── ren/      # 紅月れん（既存）
 └── aoi/      # 新キャラクター（例）
     ├── persona.md
-    ├── system_prompts/
+    ├── mind.json
     └── assets/
 ```
+
+詳細は [Mind コンポーネント概要](../../../docs/components/mind/README.md) を参照してください。

@@ -206,5 +206,4 @@ def test_load_mind_json():
 ## 関連ドキュメント
 
 - [README](./README.md) - Saint Graph 概要
-- [Mind - Character System](../../components/mind/character-system.md) - キャラクター定義
-- [Mind - Character Creation](../../components/mind/character-creation-guide.md) - キャラクター作成
+- [Mind 概要](../mind/README.md) - キャラクター定義とキャラクター作成

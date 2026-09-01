@@ -376,6 +376,31 @@ docker compose logs -f body-streamer | grep "change_emotion"
 
 ---
 
+## 依存関係の問題
+
+### mcp 2.x で google-adk が ImportError になる
+
+**症状**:
+```
+ModuleNotFoundError: No module named 'mcp.shared.session'
+```
+`pip install` は成功するのに、テスト実行時やアプリ起動時に `google-adk` の import で失敗する。
+
+**原因**:
+`mcp` 2.0 のメジャーバージョンアップで内部モジュール構成が変更され（`mcp.shared.session` の削除など）、`google-adk` が要求する `mcp>=1.24,<2` と互換性がなくなった。バージョン未固定 (`mcp`) の requirements で新規インストールすると 2.x が入ってしまう。
+
+**解決方法**:
+
+各 `requirements.txt` では `mcp>=1.24,<2` に固定済み。もし手元の環境で 2.x が入ってしまった場合は、以下でダウングレードする：
+
+```bash
+pip install "mcp>=1.24,<2"
+```
+
+**教訓**: `google-adk` と `mcp` のように密結合したライブラリは、requirements にバージョン上限を明記して破壊的リリースから防御する。
+
+---
+
 ## テストの問題
 
 ### テストが失敗する (サービス接続)
@@ -645,4 +670,4 @@ docker compose up
 
 ---
 
-**最終更新**: 2026-02-02
+**最終更新**: 2026-08-31

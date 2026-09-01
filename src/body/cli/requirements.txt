@@ -2,4 +2,5 @@ fastapi
 uvicorn
 sse-starlette
 httpx
-mcp
+# mcp 2.x は google-adk (saint-graph 側) と非互換のためバージョンを統一
+mcp>=1.24,<2

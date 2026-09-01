@@ -23,8 +23,8 @@ pytest tests/unit/
 モックされたツールやサーバーを使い、内部ロジックを検証します。
 
 ```bash
-# MCPサーバー単体の検証
-pytest tests/integration/test_mcp_body_cli.py
+# Body CLI の REST API 検証
+pytest tests/integration/test_rest_body_cli.py
 
 # エージェントのシナリオ検証（実LLM使用）
 GOOGLE_API_KEY=your_key pytest tests/integration/test_agent_scenarios.py
